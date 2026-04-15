@@ -4,366 +4,225 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>皮克敏座標擷取器</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Be+Vietnam+Pro:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          "primary":                   "#386b02",
+          "primary-container":         "#b7f481",
+          "on-primary-container":      "#2f5c00",
+          "secondary-container":       "#ffd9e2",
+          "on-secondary-container":    "#863655",
+          "tertiary-container":        "#81d4fa",
+          "on-tertiary-container":     "#00485e",
+          "tertiary":                  "#006786",
+          "surface":                   "#faf9f6",
+          "surface-container-lowest":  "#ffffff",
+          "surface-container-low":     "#f4f4f0",
+          "surface-container":         "#eeeeea",
+          "surface-container-high":    "#e8e8e4",
+          "surface-container-highest": "#e1e3df",
+          "on-surface":                "#303330",
+          "on-surface-variant":        "#5d605c",
+          "on-background":             "#303330",
+          "outline":                   "#797b78",
+          "outline-variant":           "#b1b2af",
+          "error":                     "#aa371c",
+          "error-dim":                 "#821a01",
+        },
+        borderRadius: {
+          "DEFAULT": "1rem",
+          "lg":      "2rem",
+          "xl":      "3rem",
+          "full":    "9999px",
+        },
+        fontFamily: {
+          "headline": ["Plus Jakarta Sans", "sans-serif"],
+          "body":     ["Be Vietnam Pro", "sans-serif"],
+        }
+      }
+    }
+  }
+</script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #f5f8f1;
-    --surface: #ffffff;
-    --surface2: #ecf3e7;
-    --border: rgba(60,120,80,0.13);
-    --border2: rgba(60,120,80,0.22);
-    --accent: #3d9162;
-    --accent-hover: #2e7a51;
-    --accent-dim: rgba(61,145,98,0.10);
-    --accent-dim2: rgba(61,145,98,0.18);
-    --text: #1a2e20;
-    --text2: #4a6b57;
-    --text3: #8aaa97;
-    --shadow-sm: 0 1px 3px rgba(26,46,32,0.07), 0 2px 6px rgba(26,46,32,0.04);
-    --shadow-md: 0 2px 10px rgba(26,46,32,0.10), 0 4px 18px rgba(26,46,32,0.06);
-    --mono: 'JetBrains Mono', monospace;
-    --sans: 'Noto Sans TC', sans-serif;
-    --r: 14px;
-    --r-sm: 10px;
-    --r-xs: 6px;
-    --r-xxs: 4px;
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   }
-
   body {
-    font-family: var(--sans);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 56px 16px 96px;
+    background-color: #faf9f6;
+    color: #303330;
+    font-family: 'Be Vietnam Pro', sans-serif;
   }
+  textarea::placeholder { color: #5d605c; opacity: 0.6; }
 
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 460px;
-    background: linear-gradient(180deg, rgba(61,145,98,0.07) 0%, transparent 100%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .wrap { position: relative; z-index: 1; width: 100%; max-width: 680px; }
-
-  header { margin-bottom: 44px; }
-
-  .tag {
-    font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
-    color: var(--accent); text-transform: uppercase;
-    border: 1px solid rgba(61,145,98,0.28);
-    background: rgba(61,145,98,0.08);
-    display: inline-flex; align-items: center; gap: 7px;
-    padding: 4px 12px 4px 10px; border-radius: 20px;
-    margin-bottom: 18px;
-  }
-  .tag-dot {
-    width: 5px; height: 5px; border-radius: 50%;
-    background: var(--accent); flex-shrink: 0;
-    animation: blink 2.4s ease-in-out infinite;
-  }
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-
-  h1 {
-    font-size: 34px; font-weight: 300; letter-spacing: -0.7px;
-    color: var(--text); line-height: 1.15;
-  }
-  h1 span { color: var(--accent); font-weight: 500; }
-
-  .sub {
-    margin-top: 10px; font-size: 13px;
-    color: var(--text3); font-weight: 300;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .sub-sep { opacity: 0.5; }
-
-  .section-label {
-    font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
-    color: var(--text3); text-transform: uppercase;
-    margin-bottom: 10px;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .section-label::after {
-    content: '';
-    flex: 1; height: 1px;
-    background: linear-gradient(90deg, var(--border2), transparent);
-  }
-
-  .input-box {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: var(--r);
-    overflow: hidden;
-    margin-bottom: 10px;
-    box-shadow: var(--shadow-sm);
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .input-box:focus-within {
-    border-color: rgba(61,145,98,0.45);
-    box-shadow: var(--shadow-sm), 0 0 0 3px rgba(61,145,98,0.09);
-  }
-
-  textarea {
-    display: block; width: 100%;
-    background: transparent; border: none; outline: none;
-    resize: vertical; min-height: 180px;
-    font-family: var(--mono); font-size: 13px; color: var(--text2);
-    line-height: 1.75; padding: 14px 16px;
-  }
-  textarea::placeholder { color: var(--text3); line-height: 1.75; }
-
-  .input-footer {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 8px 14px;
-    border-top: 1px solid var(--border);
-    font-size: 11.5px; color: var(--text3); font-family: var(--mono);
-    gap: 8px;
-    background: rgba(61,145,98,0.03);
-  }
-  .input-footer-left { display: flex; align-items: center; gap: 10px; }
-
-  .line-count { transition: color 0.15s; }
-  .line-count.has-content { color: var(--text2); }
-
-  .clear-btn {
-    background: none; border: none; cursor: pointer;
-    color: var(--text3); font-family: var(--mono); font-size: 11px;
-    padding: 2px 7px; border-radius: var(--r-xxs);
-    transition: color 0.15s, background 0.15s;
-    letter-spacing: 0.04em;
-  }
-  .clear-btn:hover { color: var(--text); background: var(--surface2); }
-
-  .btn-row {
-    display: flex; gap: 8px;
-    margin-bottom: 32px;
-  }
-
-  .extract-btn {
-    flex: 1; padding: 13px 20px;
-    background: var(--accent);
-    border: 1px solid transparent;
-    border-radius: var(--r-sm);
-    font-family: var(--mono); font-size: 13.5px; letter-spacing: 0.06em;
-    color: #fff; cursor: pointer; font-weight: 500;
-    transition: background 0.15s, transform 0.1s, box-shadow 0.2s;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    box-shadow: 0 2px 8px rgba(61,145,98,0.30), 0 1px 2px rgba(61,145,98,0.20);
-  }
-  .extract-btn:hover {
-    background: var(--accent-hover);
-    box-shadow: 0 4px 16px rgba(61,145,98,0.36), 0 2px 4px rgba(61,145,98,0.24);
-  }
-  .extract-btn:active { transform: scale(0.985); }
-
-  .paste-btn {
-    padding: 13px 18px;
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: var(--r-sm);
-    font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.05em;
-    color: var(--text2); cursor: pointer;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
-    white-space: nowrap; flex-shrink: 0;
-    box-shadow: var(--shadow-sm);
-  }
-  .paste-btn:hover { background: var(--surface2); border-color: rgba(61,145,98,0.35); color: var(--text); }
-
-  kbd {
-    font-family: var(--mono); font-size: 10.5px;
-    border: 1px solid var(--border2); border-radius: var(--r-xxs);
-    padding: 1px 5px; color: var(--text3);
-    background: var(--surface2);
-  }
-
-  #results {
-    display: none;
-    animation: fadeUp 0.22s ease both;
-  }
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(10px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-
-  .results-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 14px;
-  }
-  .results-count {
-    font-family: var(--mono); font-size: 12px; color: var(--text3);
-    display: flex; align-items: baseline; gap: 6px;
-  }
-  .results-count strong { color: var(--accent); font-weight: 600; font-size: 17px; }
-
-  .copy-all-btn {
-    display: flex; align-items: center; gap: 6px;
-    padding: 7px 14px;
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: var(--r-xs);
-    font-family: var(--mono); font-size: 11.5px;
-    color: var(--text2); cursor: pointer;
-    transition: all 0.15s;
-    box-shadow: var(--shadow-sm);
-  }
-  .copy-all-btn:hover { border-color: rgba(61,145,98,0.4); color: var(--accent); background: var(--accent-dim); }
-  .copy-all-btn.ok { border-color: rgba(61,145,98,0.45); color: var(--accent); background: var(--accent-dim); }
-
-  .coord-list { display: flex; flex-direction: column; gap: 6px; }
-
-  .coord-card {
-    display: flex; align-items: center;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--r-sm);
-    padding: 12px 14px 12px 16px;
-    cursor: pointer;
-    transition: border-color 0.15s, transform 0.12s, box-shadow 0.15s;
-    gap: 12px;
-    box-shadow: var(--shadow-sm);
-    animation: slideIn 0.2s ease both;
-  }
   @keyframes slideIn {
-    from { opacity: 0; transform: translateY(5px); }
+    from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-  .coord-card:hover {
-    border-color: rgba(61,145,98,0.32);
-    transform: translateX(2px);
-    box-shadow: var(--shadow-md);
-  }
-  .coord-card.flash {
-    background: rgba(61,145,98,0.06);
-    border-color: rgba(61,145,98,0.32);
-  }
-
-  .card-num {
-    font-family: var(--mono); font-size: 11px; color: var(--text3);
-    min-width: 20px; text-align: right; flex-shrink: 0;
-    user-select: none;
-  }
-  .card-sep {
-    width: 1px; height: 28px;
-    background: var(--border);
-    flex-shrink: 0;
-  }
-  .card-body { flex: 1; min-width: 0; }
-  .card-label {
-    font-size: 11px; color: var(--text3);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    margin-bottom: 3px; letter-spacing: 0.02em;
-  }
-  .card-coord {
-    font-family: var(--mono); font-size: 15px; font-weight: 600;
-    color: var(--text); letter-spacing: 0.02em;
-  }
-  .card-action {
-    font-family: var(--mono); font-size: 11px;
-    padding: 5px 12px; border-radius: var(--r-xs);
-    border: 1px solid var(--border2);
-    background: var(--surface2);
-    color: var(--text3); flex-shrink: 0;
-    transition: all 0.15s;
-    min-width: 52px; text-align: center;
-    user-select: none;
-  }
-  .coord-card:hover .card-action { border-color: rgba(61,145,98,0.35); color: var(--accent); background: var(--accent-dim); }
-  .card-action.ok { border-color: rgba(61,145,98,0.45); color: var(--accent); background: var(--accent-dim); }
-
-  .empty-state {
-    padding: 36px 20px; text-align: center;
-    border: 1px dashed var(--border2);
-    border-radius: var(--r);
-    background: var(--surface);
-    box-shadow: var(--shadow-sm);
-  }
-  .empty-icon { font-size: 24px; margin-bottom: 12px; opacity: 0.45; }
-  .empty-msg { font-family: var(--mono); font-size: 12.5px; color: var(--text3); }
-  .empty-hint {
-    margin-top: 8px; font-family: var(--mono);
-    font-size: 11px; color: var(--text3); opacity: 0.65;
-    line-height: 1.8;
-  }
-
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-
-  @media (max-width: 480px) {
-    body { padding: 36px 12px 72px; }
-    h1 { font-size: 28px; }
-    .btn-row { flex-direction: column; }
-    .paste-btn { padding: 12px 16px; }
-    .card-coord { font-size: 13.5px; }
-    .extract-btn { font-size: 13px; }
-  }
+  .anim-fadeup  { animation: fadeUp  0.24s ease both; }
+  .anim-slidein { animation: slideIn 0.22s ease both; }
 </style>
 </head>
-<body>
-<div class="wrap">
-  <header>
-    <div class="tag">
-      <span class="tag-dot"></span>
-      Coordinate Extractor
-    </div>
-    <h1>皮克敏<span>座標擷取器</span></h1>
-    <p class="sub">
-      貼上 Telegram 訊息
-      <span class="sub-sep">→</span>
-      一鍵複製座標
-    </p>
-  </header>
+<body class="min-h-screen pb-36">
 
-  <div class="section-label">訊息內容</div>
+<!-- Top App Bar -->
+<header class="sticky top-0 z-50
+               bg-[#faf9f6]/85 backdrop-blur-md
+               shadow-[0_4px_24px_rgba(48,51,48,0.07)]
+               flex items-center justify-between px-6 py-4">
+  <div class="flex items-center gap-3">
+    <span class="material-symbols-outlined text-xl" style="color:#386b02">potted_plant</span>
+    <h1 class="text-xl font-headline font-bold" style="color:#386b02">Botanical Archivist</h1>
+  </div>
+</header>
 
-  <div class="input-box">
-    <textarea id="input" placeholder="1. (紐西蘭) Albert-EdenGreenlane
-• 座標：-36.891357,174.795049
-• 建議：中高優先
+<main class="px-5 pt-8 max-w-2xl mx-auto space-y-8">
 
-2. (美国) Rochester
-• 座標：44.021698,-92.460725
-• 建議：高優先
+  <!-- Hero -->
+  <section class="space-y-1">
+    <h2 class="text-4xl font-headline font-extrabold tracking-tight text-on-background leading-tight">
+      皮克敏 <span class="text-primary">座標擷取器</span>
+    </h2>
+    <p class="text-sm font-body text-on-surface-variant">整理繁雜的訊息，一鍵擷取座標存檔。</p>
+  </section>
 
-...（支援一次貼多筆）" oninput="onInput(this)"></textarea>
-    <div class="input-footer">
-      <div class="input-footer-left">
-        <span class="line-count" id="line-count">— 行</span>
-        <button class="clear-btn" onclick="clearInput()">清空</button>
+  <!-- Input Card -->
+  <section>
+    <div class="bg-surface-container-low rounded-lg p-6 shadow-sm">
+
+      <label class="block text-xs font-headline font-semibold text-on-surface-variant
+                    uppercase tracking-widest mb-2">訊息內容</label>
+
+      <textarea id="input"
+        class="w-full h-48 bg-surface-container-high border-none rounded p-4
+               text-on-surface text-sm font-body
+               focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest
+               outline-none resize-y transition-all"
+        placeholder="1. (紐西蘭) Albert-EdenGreenlane&#10;• 座標：-36.891357,174.795049&#10;• 建議：中高優先&#10;&#10;...（支援一次貼多筆）"
+        oninput="onInput(this)"></textarea>
+
+      <!-- Inline meta row -->
+      <div class="flex items-center justify-between mt-2 px-0.5">
+        <span id="line-count" class="text-xs font-body text-on-surface-variant/50">—</span>
+        <span class="text-xs font-body text-on-surface-variant/40">
+          <kbd class="bg-surface-container border border-outline-variant/40 rounded px-1.5 py-0.5 text-xs">Ctrl</kbd>
+          +
+          <kbd class="bg-surface-container border border-outline-variant/40 rounded px-1.5 py-0.5 text-xs">Enter</kbd>
+        </span>
       </div>
-      <span><kbd>Ctrl</kbd> + <kbd>Enter</kbd> 快速擷取</span>
-    </div>
-  </div>
 
-  <div class="btn-row">
-    <button class="extract-btn" onclick="extract()">
-      <span>▶</span> 擷取座標
-    </button>
-    <button class="paste-btn" onclick="pasteClipboard()">貼上</button>
-  </div>
+      <!-- Primary action -->
+      <div class="flex gap-3 mt-4">
+        <button onclick="extract()"
+          class="flex-1 bg-primary text-white font-headline font-bold py-4 rounded-full
+                 shadow-[0_4px_16px_rgba(56,107,2,0.30)]
+                 hover:bg-[#2e7a51] active:scale-95 transition-all duration-200
+                 flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-[20px]">search</span>
+          擷取座標
+        </button>
+        <button onclick="pasteClipboard()"
+          class="bg-surface-container-lowest border border-outline-variant/50
+                 text-on-surface-variant font-headline font-semibold
+                 px-5 rounded-full
+                 hover:bg-surface-container hover:border-primary/30
+                 active:scale-95 transition-all duration-200
+                 flex items-center justify-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">content_paste</span>
+          貼上
+        </button>
+      </div>
 
-  <div id="results">
-    <div class="results-header">
-      <div class="results-count" id="count"></div>
-      <button class="copy-all-btn" id="copy-all-btn" onclick="copyAll()">
-        <span id="copy-all-label">複製全部</span>
-      </button>
+      <!-- Clear -->
+      <div class="flex justify-center mt-3">
+        <button onclick="clearInput()"
+          class="w-1/2 bg-surface-container-lowest border border-outline-variant/30
+                 text-on-surface-variant/60 font-headline font-semibold text-sm
+                 py-3 rounded-full
+                 hover:bg-surface-container hover:text-error-dim
+                 active:scale-95 transition-all duration-200
+                 flex items-center justify-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px]">delete_sweep</span>
+          清空
+        </button>
+      </div>
     </div>
-    <div class="coord-list" id="list"></div>
-  </div>
-</div>
+  </section>
+
+  <!-- Results -->
+  <section id="results" class="space-y-5 hidden anim-fadeup">
+
+    <!-- Results header -->
+    <div class="flex items-center justify-between">
+      <h3 class="text-xl font-headline font-bold text-on-background">擷取結果</h3>
+      <div class="flex items-center gap-3">
+        <span id="count"
+          class="text-xs font-body uppercase tracking-widest text-on-surface-variant/60"></span>
+        <button id="copy-all-btn" onclick="copyAll()"
+          class="hidden bg-surface-container-lowest border border-outline-variant/40
+                 text-primary font-headline font-semibold text-xs
+                 px-4 py-2 rounded-full
+                 hover:bg-primary-container/40 active:scale-95 transition-all duration-200
+                 flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[15px]">file_copy</span>
+          <span id="copy-all-label">複製全部</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Card list -->
+    <div id="list" class="space-y-3"></div>
+  </section>
+
+  <!-- Info card -->
+  <section class="bg-secondary-container rounded-lg p-6 relative overflow-hidden">
+    <div class="relative z-10 space-y-2">
+      <h4 class="font-headline font-bold text-on-secondary-container">使用說明</h4>
+      <p class="text-sm text-on-secondary-container/80 leading-relaxed font-body">
+        貼入 Telegram 訊息後點擊「擷取座標」，支援負數座標與多筆輸入。
+        點擊任一結果卡片可複製該筆座標。
+      </p>
+    </div>
+    <div class="absolute -right-6 -bottom-6 opacity-10 pointer-events-none select-none">
+      <span class="material-symbols-outlined text-[100px]">eco</span>
+    </div>
+  </section>
+
+</main>
+
+<!-- Bottom Nav -->
+<nav class="fixed bottom-0 left-0 w-full z-50
+            flex justify-around items-center px-8 pb-6 pt-3
+            bg-[#faf9f6]/85 backdrop-blur-md
+            rounded-t-[2rem]
+            shadow-[0_-4px_24px_rgba(48,51,48,0.07)]">
+  <a href="#"
+    class="flex flex-col items-center text-white bg-primary
+           rounded-full px-5 py-2.5 shadow-md
+           active:scale-90 transition-all duration-200">
+    <span class="material-symbols-outlined text-[22px]">content_paste_search</span>
+    <span class="font-headline text-[10px] font-semibold uppercase tracking-widest mt-0.5">Extractor</span>
+  </a>
+  <a href="#"
+    class="flex flex-col items-center text-on-surface/40 py-2
+           hover:text-primary active:scale-90 transition-all duration-200">
+    <span class="material-symbols-outlined text-[22px]">history</span>
+    <span class="font-headline text-[10px] font-semibold uppercase tracking-widest mt-0.5">History</span>
+  </a>
+  <a href="#"
+    class="flex flex-col items-center text-on-surface/40 py-2
+           hover:text-primary active:scale-90 transition-all duration-200">
+    <span class="material-symbols-outlined text-[22px]">folder_zip</span>
+    <span class="font-headline text-[10px] font-semibold uppercase tracking-widest mt-0.5">Archives</span>
+  </a>
+</nav>
 
 <script>
 let coords = [];
@@ -373,13 +232,13 @@ function extract() {
   if (!text) return;
   coords = [];
 
-  const lines = text.split('\n');
+  const lines  = text.split('\n');
   const coordRe = /[-\d]+\.\d+\s*,\s*[-\d]+\.\d+/g;
-  const locRe = /^\d+[\.\、\)）]\s*(.+)/;
+  const locRe   = /^\d+[\.\、\)）]\s*(.+)/;
   let label = '';
 
   for (const line of lines) {
-    const l = line.trim();
+    const l  = line.trim();
     const lm = l.match(locRe);
     if (lm) label = lm[1].replace(/[()（）【】]/g, '').trim();
     const ms = l.match(coordRe);
@@ -399,61 +258,89 @@ function render() {
   const listEl = document.getElementById('list');
   const resEl  = document.getElementById('results');
   listEl.innerHTML = '';
-  resEl.style.display = 'block';
+  resEl.classList.remove('hidden');
 
   if (coords.length === 0) {
     listEl.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">◎</div>
-        <div class="empty-msg">未找到座標</div>
-        <div class="empty-hint">
-          請確認格式含「數字,數字」<br>
-          例：-36.891357,174.795049
-        </div>
+      <div class="bg-surface-container-low rounded-lg p-10 text-center
+                  border border-dashed border-outline-variant/40">
+        <span class="material-symbols-outlined text-[40px] text-on-surface-variant/25 block mb-3">
+          search_off
+        </span>
+        <p class="font-headline font-semibold text-on-surface-variant">未找到座標</p>
+        <p class="text-sm font-body text-on-surface-variant/50 mt-1">
+          請確認格式含「數字,數字」<br>例：-36.891357,174.795049
+        </p>
       </div>`;
-    document.getElementById('count').innerHTML = '';
-    document.getElementById('copy-all-btn').style.display = 'none';
+    document.getElementById('count').textContent = '';
+    document.getElementById('copy-all-btn').classList.add('hidden');
     return;
   }
 
-  document.getElementById('count').innerHTML =
-    `找到 <strong>${coords.length}</strong> 筆座標`;
-  document.getElementById('copy-all-btn').style.display = '';
+  document.getElementById('count').textContent = `找到 ${coords.length} 個座標`;
+  document.getElementById('copy-all-btn').classList.remove('hidden');
 
   coords.forEach((r, i) => {
     const card = document.createElement('div');
-    card.className = 'coord-card';
-    card.style.animationDelay = `${Math.min(i * 28, 200)}ms`;
+    card.className = [
+      'anim-slidein',
+      'bg-surface-container-lowest rounded-lg p-5',
+      'flex items-center justify-between',
+      'shadow-sm cursor-pointer',
+      'hover:shadow-md transition-shadow duration-200',
+      i === 0 ? 'border-l-4 border-primary' : '',
+    ].join(' ');
+    card.style.animationDelay = `${Math.min(i * 30, 210)}ms`;
+
     card.innerHTML = `
-      <span class="card-num">${i + 1}</span>
-      <div class="card-sep"></div>
-      <div class="card-body">
-        ${r.label ? `<div class="card-label">${esc(r.label)}</div>` : ''}
-        <div class="card-coord">${esc(r.coord)}</div>
+      <div class="flex items-center gap-4">
+        <div class="w-11 h-11 rounded-full bg-[#81d4fa]/30
+                    flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-[#006786]">location_on</span>
+        </div>
+        <div class="space-y-1">
+          <div class="bg-[#81d4fa] text-[#00485e]
+                      px-3 py-1 rounded-full text-xs font-headline font-bold w-fit">
+            ${esc(r.coord)}
+          </div>
+          ${r.label
+            ? `<p class="text-sm font-body text-on-surface-variant">${esc(r.label)}</p>`
+            : ''}
+        </div>
       </div>
-      <span class="card-action" id="act${i}">複製</span>
+      <button id="act${i}"
+        class="bg-surface-container text-primary p-3 rounded-full
+               hover:bg-primary-container/50 active:scale-90 transition-all duration-200
+               flex-shrink-0"
+        aria-label="複製座標">
+        <span class="material-symbols-outlined text-[20px]">content_copy</span>
+      </button>
     `;
+
+    const btn = card.querySelector('button');
+    btn.addEventListener('click', e => { e.stopPropagation(); copyOne(r.coord, i, card); });
     card.addEventListener('click', () => copyOne(r.coord, i, card));
     listEl.appendChild(card);
   });
 }
 
-function flashCopied(labelEl, btnEl, revertText, delay) {
-  labelEl.textContent = '✓ 已複製';
-  btnEl.classList.add('ok');
+function flashCopied(iconEl, btnEl, revertIcon) {
+  iconEl.textContent = 'check';
+  btnEl.classList.add('!bg-primary-container/60');
   setTimeout(() => {
-    labelEl.textContent = revertText;
-    btnEl.classList.remove('ok');
-  }, delay);
+    iconEl.textContent = revertIcon;
+    btnEl.classList.remove('!bg-primary-container/60');
+  }, 1400);
 }
 
 function copyOne(coord, idx, card) {
   navigator.clipboard.writeText(coord)
     .then(() => {
-      const act = document.getElementById('act' + idx);
-      flashCopied(act, act, '複製', 1400);
-      card.classList.add('flash');
-      setTimeout(() => card.classList.remove('flash'), 1400);
+      const btn  = document.getElementById('act' + idx);
+      const icon = btn.querySelector('.material-symbols-outlined');
+      flashCopied(icon, btn, 'content_copy');
+      card.classList.add('!border-primary', 'bg-[#b7f481]/10');
+      setTimeout(() => card.classList.remove('!border-primary', 'bg-[#b7f481]/10'), 1400);
     })
     .catch(() => {});
 }
@@ -464,7 +351,12 @@ function copyAll() {
     .then(() => {
       const btn   = document.getElementById('copy-all-btn');
       const label = document.getElementById('copy-all-label');
-      flashCopied(label, btn, '複製全部', 1600);
+      label.textContent = '✓ 已複製全部';
+      btn.classList.add('!bg-primary-container/40', '!border-primary/30');
+      setTimeout(() => {
+        label.textContent = '複製全部';
+        btn.classList.remove('!bg-primary-container/40', '!border-primary/30');
+      }, 1600);
     })
     .catch(() => {});
 }
@@ -475,7 +367,7 @@ function clearInput() {
   onInput(el);
   el.focus();
   coords = [];
-  document.getElementById('results').style.display = 'none';
+  document.getElementById('results').classList.add('hidden');
 }
 
 async function pasteClipboard() {
@@ -486,20 +378,16 @@ async function pasteClipboard() {
     onInput(el);
     el.focus();
   } catch {
-    // Permission denied or API unavailable — fall back to manual paste
+    // Permission denied or API unavailable — focus for manual paste
     document.getElementById('input').focus();
   }
 }
 
 function onInput(el) {
   const lc = document.getElementById('line-count');
-  if (!el.value.trim()) {
-    lc.textContent = '— 行';
-    lc.classList.remove('has-content');
-  } else {
-    lc.textContent = el.value.split('\n').length + ' 行';
-    lc.classList.add('has-content');
-  }
+  lc.textContent = el.value.trim()
+    ? el.value.split('\n').length + ' 行'
+    : '—';
 }
 
 function esc(str) {
