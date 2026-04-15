@@ -10,23 +10,26 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #0e0e10;
-    --surface: #18181b;
-    --surface2: #232329;
-    --surface3: #2a2a32;
-    --border: rgba(255,255,255,0.07);
-    --border2: rgba(255,255,255,0.13);
-    --accent: #4ade80;
-    --accent-dim: rgba(74,222,128,0.10);
-    --accent-dim2: rgba(74,222,128,0.20);
-    --text: #f4f4f5;
-    --text2: #a1a1aa;
-    --text3: #52525b;
+    --bg: #f5f8f1;
+    --surface: #ffffff;
+    --surface2: #ecf3e7;
+    --border: rgba(60,120,80,0.13);
+    --border2: rgba(60,120,80,0.22);
+    --accent: #3d9162;
+    --accent-hover: #2e7a51;
+    --accent-dim: rgba(61,145,98,0.10);
+    --accent-dim2: rgba(61,145,98,0.18);
+    --text: #1a2e20;
+    --text2: #4a6b57;
+    --text3: #8aaa97;
+    --shadow-sm: 0 1px 3px rgba(26,46,32,0.07), 0 2px 6px rgba(26,46,32,0.04);
+    --shadow-md: 0 2px 10px rgba(26,46,32,0.10), 0 4px 18px rgba(26,46,32,0.06);
     --mono: 'JetBrains Mono', monospace;
     --sans: 'Noto Sans TC', sans-serif;
-    --r: 12px;
-    --r-sm: 8px;
-    --r-xs: 5px;
+    --r: 14px;
+    --r-sm: 10px;
+    --r-xs: 6px;
+    --r-xxs: 4px;
   }
 
   body {
@@ -40,49 +43,32 @@
     padding: 56px 16px 96px;
   }
 
-  /* 背景格線 */
   body::before {
     content: '';
-    position: fixed; inset: 0;
-    background-image:
-      linear-gradient(rgba(74,222,128,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(74,222,128,0.025) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* 頂部光暈 */
-  body::after {
-    content: '';
     position: fixed;
-    top: -180px; left: 50%;
-    transform: translateX(-50%);
-    width: 600px; height: 380px;
-    background: radial-gradient(ellipse, rgba(74,222,128,0.07) 0%, transparent 70%);
+    top: 0; left: 0; right: 0;
+    height: 460px;
+    background: linear-gradient(180deg, rgba(61,145,98,0.07) 0%, transparent 100%);
     pointer-events: none;
     z-index: 0;
   }
 
   .wrap { position: relative; z-index: 1; width: 100%; max-width: 680px; }
 
-  /* ── Header ─────────────────────────────────────── */
   header { margin-bottom: 44px; }
 
   .tag {
     font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
     color: var(--accent); text-transform: uppercase;
-    border: 1px solid rgba(74,222,128,0.25);
-    background: rgba(74,222,128,0.06);
+    border: 1px solid rgba(61,145,98,0.28);
+    background: rgba(61,145,98,0.08);
     display: inline-flex; align-items: center; gap: 7px;
     padding: 4px 12px 4px 10px; border-radius: 20px;
     margin-bottom: 18px;
   }
   .tag-dot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: var(--accent);
-    flex-shrink: 0;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--accent); flex-shrink: 0;
     animation: blink 2.4s ease-in-out infinite;
   }
   @keyframes blink {
@@ -101,9 +87,8 @@
     color: var(--text3); font-weight: 300;
     display: flex; align-items: center; gap: 8px;
   }
-  .sub-sep { opacity: 0.4; }
+  .sub-sep { opacity: 0.5; }
 
-  /* ── 分隔線標籤 ───────────────────────────────── */
   .section-label {
     font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
     color: var(--text3); text-transform: uppercase;
@@ -116,18 +101,18 @@
     background: linear-gradient(90deg, var(--border2), transparent);
   }
 
-  /* ── Input box ───────────────────────────────── */
   .input-box {
     background: var(--surface);
     border: 1px solid var(--border2);
     border-radius: var(--r);
     overflow: hidden;
     margin-bottom: 10px;
+    box-shadow: var(--shadow-sm);
     transition: border-color 0.2s, box-shadow 0.2s;
   }
   .input-box:focus-within {
-    border-color: rgba(74,222,128,0.35);
-    box-shadow: 0 0 0 3px rgba(74,222,128,0.06);
+    border-color: rgba(61,145,98,0.45);
+    box-shadow: var(--shadow-sm), 0 0 0 3px rgba(61,145,98,0.09);
   }
 
   textarea {
@@ -145,6 +130,7 @@
     border-top: 1px solid var(--border);
     font-size: 11.5px; color: var(--text3); font-family: var(--mono);
     gap: 8px;
+    background: rgba(61,145,98,0.03);
   }
   .input-footer-left { display: flex; align-items: center; gap: 10px; }
 
@@ -154,13 +140,12 @@
   .clear-btn {
     background: none; border: none; cursor: pointer;
     color: var(--text3); font-family: var(--mono); font-size: 11px;
-    padding: 2px 7px; border-radius: var(--r-xs);
+    padding: 2px 7px; border-radius: var(--r-xxs);
     transition: color 0.15s, background 0.15s;
     letter-spacing: 0.04em;
   }
   .clear-btn:hover { color: var(--text); background: var(--surface2); }
 
-  /* ── 按鈕列 ──────────────────────────────────── */
   .btn-row {
     display: flex; gap: 8px;
     margin-bottom: 32px;
@@ -168,17 +153,18 @@
 
   .extract-btn {
     flex: 1; padding: 13px 20px;
-    background: var(--accent-dim);
-    border: 1px solid rgba(74,222,128,0.30);
+    background: var(--accent);
+    border: 1px solid transparent;
     border-radius: var(--r-sm);
     font-family: var(--mono); font-size: 13.5px; letter-spacing: 0.06em;
-    color: var(--accent); cursor: pointer;
+    color: #fff; cursor: pointer; font-weight: 500;
     transition: background 0.15s, transform 0.1s, box-shadow 0.2s;
     display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 2px 8px rgba(61,145,98,0.30), 0 1px 2px rgba(61,145,98,0.20);
   }
   .extract-btn:hover {
-    background: var(--accent-dim2);
-    box-shadow: 0 0 20px rgba(74,222,128,0.14);
+    background: var(--accent-hover);
+    box-shadow: 0 4px 16px rgba(61,145,98,0.36), 0 2px 4px rgba(61,145,98,0.24);
   }
   .extract-btn:active { transform: scale(0.985); }
 
@@ -191,17 +177,17 @@
     color: var(--text2); cursor: pointer;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
     white-space: nowrap; flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
   }
-  .paste-btn:hover { background: var(--surface2); border-color: rgba(74,222,128,0.25); color: var(--text); }
+  .paste-btn:hover { background: var(--surface2); border-color: rgba(61,145,98,0.35); color: var(--text); }
 
   kbd {
     font-family: var(--mono); font-size: 10.5px;
-    border: 1px solid var(--border2); border-radius: 4px;
+    border: 1px solid var(--border2); border-radius: var(--r-xxs);
     padding: 1px 5px; color: var(--text3);
     background: var(--surface2);
   }
 
-  /* ── Results ─────────────────────────────────── */
   #results {
     display: none;
     animation: fadeUp 0.22s ease both;
@@ -219,33 +205,23 @@
     font-family: var(--mono); font-size: 12px; color: var(--text3);
     display: flex; align-items: baseline; gap: 6px;
   }
-  .results-count strong {
-    color: var(--accent); font-weight: 600; font-size: 17px;
-  }
+  .results-count strong { color: var(--accent); font-weight: 600; font-size: 17px; }
 
   .copy-all-btn {
     display: flex; align-items: center; gap: 6px;
     padding: 7px 14px;
-    background: transparent;
+    background: var(--surface);
     border: 1px solid var(--border2);
     border-radius: var(--r-xs);
     font-family: var(--mono); font-size: 11.5px;
     color: var(--text2); cursor: pointer;
     transition: all 0.15s;
+    box-shadow: var(--shadow-sm);
   }
-  .copy-all-btn:hover {
-    border-color: rgba(74,222,128,0.4);
-    color: var(--accent);
-    background: var(--accent-dim);
-  }
-  .copy-all-btn.ok {
-    border-color: rgba(74,222,128,0.45);
-    color: var(--accent);
-    background: var(--accent-dim);
-  }
+  .copy-all-btn:hover { border-color: rgba(61,145,98,0.4); color: var(--accent); background: var(--accent-dim); }
+  .copy-all-btn.ok { border-color: rgba(61,145,98,0.45); color: var(--accent); background: var(--accent-dim); }
 
-  /* ── Coord cards ─────────────────────────────── */
-  .coord-list { display: flex; flex-direction: column; gap: 5px; }
+  .coord-list { display: flex; flex-direction: column; gap: 6px; }
 
   .coord-card {
     display: flex; align-items: center;
@@ -254,8 +230,9 @@
     border-radius: var(--r-sm);
     padding: 12px 14px 12px 16px;
     cursor: pointer;
-    transition: background 0.12s, border-color 0.15s, transform 0.12s;
+    transition: border-color 0.15s, transform 0.12s, box-shadow 0.15s;
     gap: 12px;
+    box-shadow: var(--shadow-sm);
     animation: slideIn 0.2s ease both;
   }
   @keyframes slideIn {
@@ -263,13 +240,13 @@
     to   { opacity: 1; transform: translateY(0); }
   }
   .coord-card:hover {
-    background: var(--surface2);
-    border-color: var(--border2);
+    border-color: rgba(61,145,98,0.32);
     transform: translateX(2px);
+    box-shadow: var(--shadow-md);
   }
   .coord-card.flash {
-    background: rgba(74,222,128,0.07);
-    border-color: rgba(74,222,128,0.28);
+    background: rgba(61,145,98,0.06);
+    border-color: rgba(61,145,98,0.32);
   }
 
   .card-num {
@@ -295,48 +272,35 @@
   .card-action {
     font-family: var(--mono); font-size: 11px;
     padding: 5px 12px; border-radius: var(--r-xs);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border2);
     background: var(--surface2);
     color: var(--text3); flex-shrink: 0;
     transition: all 0.15s;
     min-width: 52px; text-align: center;
     user-select: none;
   }
-  .coord-card:hover .card-action {
-    border-color: rgba(74,222,128,0.30);
-    color: var(--accent);
-    background: var(--accent-dim);
-  }
-  .card-action.ok {
-    border-color: rgba(74,222,128,0.45);
-    color: var(--accent);
-    background: var(--accent-dim);
-  }
+  .coord-card:hover .card-action { border-color: rgba(61,145,98,0.35); color: var(--accent); background: var(--accent-dim); }
+  .card-action.ok { border-color: rgba(61,145,98,0.45); color: var(--accent); background: var(--accent-dim); }
 
-  /* ── Empty state ─────────────────────────────── */
   .empty-state {
-    padding: 36px 20px;
-    text-align: center;
-    border: 1px dashed rgba(255,255,255,0.10);
+    padding: 36px 20px; text-align: center;
+    border: 1px dashed var(--border2);
     border-radius: var(--r);
     background: var(--surface);
+    box-shadow: var(--shadow-sm);
   }
-  .empty-icon { font-size: 24px; margin-bottom: 12px; opacity: 0.4; }
-  .empty-msg {
-    font-family: var(--mono); font-size: 12.5px; color: var(--text3);
-  }
+  .empty-icon { font-size: 24px; margin-bottom: 12px; opacity: 0.45; }
+  .empty-msg { font-family: var(--mono); font-size: 12.5px; color: var(--text3); }
   .empty-hint {
     margin-top: 8px; font-family: var(--mono);
-    font-size: 11px; color: var(--text3); opacity: 0.55;
+    font-size: 11px; color: var(--text3); opacity: 0.65;
     line-height: 1.8;
   }
 
-  /* ── Scrollbar ───────────────────────────────── */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
-  /* ── Mobile ──────────────────────────────────── */
   @media (max-width: 480px) {
     body { padding: 36px 12px 72px; }
     h1 { font-size: 28px; }
@@ -474,32 +438,35 @@ function render() {
   });
 }
 
+function flashCopied(labelEl, btnEl, revertText, delay) {
+  labelEl.textContent = '✓ 已複製';
+  btnEl.classList.add('ok');
+  setTimeout(() => {
+    labelEl.textContent = revertText;
+    btnEl.classList.remove('ok');
+  }, delay);
+}
+
 function copyOne(coord, idx, card) {
-  navigator.clipboard.writeText(coord).then(() => {
-    const act = document.getElementById('act' + idx);
-    act.textContent = '✓ 已複製';
-    act.classList.add('ok');
-    card.classList.add('flash');
-    setTimeout(() => {
-      act.textContent = '複製';
-      act.classList.remove('ok');
-      card.classList.remove('flash');
-    }, 1400);
-  });
+  navigator.clipboard.writeText(coord)
+    .then(() => {
+      const act = document.getElementById('act' + idx);
+      flashCopied(act, act, '複製', 1400);
+      card.classList.add('flash');
+      setTimeout(() => card.classList.remove('flash'), 1400);
+    })
+    .catch(() => {});
 }
 
 function copyAll() {
   if (!coords.length) return;
-  navigator.clipboard.writeText(coords.map(r => r.coord).join('\n')).then(() => {
-    const btn   = document.getElementById('copy-all-btn');
-    const label = document.getElementById('copy-all-label');
-    label.textContent = '✓ 已複製全部';
-    btn.classList.add('ok');
-    setTimeout(() => {
-      label.textContent = '複製全部';
-      btn.classList.remove('ok');
-    }, 1600);
-  });
+  navigator.clipboard.writeText(coords.map(r => r.coord).join('\n'))
+    .then(() => {
+      const btn   = document.getElementById('copy-all-btn');
+      const label = document.getElementById('copy-all-label');
+      flashCopied(label, btn, '複製全部', 1600);
+    })
+    .catch(() => {});
 }
 
 function clearInput() {
@@ -507,8 +474,8 @@ function clearInput() {
   el.value = '';
   onInput(el);
   el.focus();
-  document.getElementById('results').style.display = 'none';
   coords = [];
+  document.getElementById('results').style.display = 'none';
 }
 
 async function pasteClipboard() {
@@ -519,6 +486,7 @@ async function pasteClipboard() {
     onInput(el);
     el.focus();
   } catch {
+    // Permission denied or API unavailable — fall back to manual paste
     document.getElementById('input').focus();
   }
 }
@@ -539,7 +507,8 @@ function esc(str) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 document.getElementById('input').addEventListener('keydown', e => {
