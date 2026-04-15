@@ -66,31 +66,104 @@
     from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+  @keyframes pikminBob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-5px); }
+  }
   .anim-fadeup  { animation: fadeUp  0.24s ease both; }
   .anim-slidein { animation: slideIn 0.22s ease both; }
+  .pikmin-bob-1 { animation: pikminBob 2.8s ease-in-out infinite; }
+  .pikmin-bob-2 { animation: pikminBob 2.8s ease-in-out infinite 0.4s; }
+  .pikmin-bob-3 { animation: pikminBob 2.8s ease-in-out infinite 0.9s; }
 </style>
 </head>
-<body class="min-h-screen pb-36">
+<body class="min-h-screen pb-12">
+
+<!-- ── Pikmin SVG definitions (reusable) ── -->
+<svg style="display:none">
+  <defs>
+    <!-- Red Pikmin -->
+    <symbol id="pikmin-red" viewBox="0 0 40 52">
+      <line x1="20" y1="4" x2="20" y2="13" stroke="#3a6e1a" stroke-width="1.8" stroke-linecap="round"/>
+      <ellipse cx="13" cy="5" rx="6" ry="3.5" fill="#5aab28" transform="rotate(-25 13 5)"/>
+      <ellipse cx="27" cy="5" rx="6" ry="3.5" fill="#4a9520" transform="rotate(25 27 5)"/>
+      <ellipse cx="20" cy="31" rx="13" ry="14" fill="#e53935"/>
+      <ellipse cx="20" cy="30" rx="9" ry="6" fill="#ef5350" opacity="0.5"/>
+      <circle cx="14.5" cy="25" r="3.5" fill="white"/>
+      <circle cx="25.5" cy="25" r="3.5" fill="white"/>
+      <circle cx="15.2" cy="25.6" r="1.8" fill="#222"/>
+      <circle cx="26.2" cy="25.6" r="1.8" fill="#222"/>
+      <circle cx="14.6" cy="24.8" r="0.9" fill="white"/>
+      <circle cx="25.6" cy="24.8" r="0.9" fill="white"/>
+      <ellipse cx="13" cy="46" rx="5" ry="3.5" fill="#c62828"/>
+      <ellipse cx="27" cy="46" rx="5" ry="3.5" fill="#c62828"/>
+    </symbol>
+    <!-- Yellow Pikmin -->
+    <symbol id="pikmin-yellow" viewBox="0 0 40 52">
+      <line x1="20" y1="4" x2="20" y2="12" stroke="#3a6e1a" stroke-width="1.8" stroke-linecap="round"/>
+      <ellipse cx="10" cy="8" rx="5" ry="7" fill="#f9a825" transform="rotate(-15 10 8)"/>
+      <ellipse cx="30" cy="8" rx="5" ry="7" fill="#f9a825" transform="rotate(15 30 8)"/>
+      <ellipse cx="20" cy="31" rx="13" ry="14" fill="#fdd835"/>
+      <ellipse cx="20" cy="30" rx="9" ry="6" fill="#ffee58" opacity="0.5"/>
+      <circle cx="14.5" cy="25" r="3.5" fill="white"/>
+      <circle cx="25.5" cy="25" r="3.5" fill="white"/>
+      <circle cx="15.2" cy="25.6" r="1.8" fill="#222"/>
+      <circle cx="26.2" cy="25.6" r="1.8" fill="#222"/>
+      <circle cx="14.6" cy="24.8" r="0.9" fill="white"/>
+      <circle cx="25.6" cy="24.8" r="0.9" fill="white"/>
+      <ellipse cx="13" cy="46" rx="5" ry="3.5" fill="#f57f17"/>
+      <ellipse cx="27" cy="46" rx="5" ry="3.5" fill="#f57f17"/>
+    </symbol>
+    <!-- Blue Pikmin -->
+    <symbol id="pikmin-blue" viewBox="0 0 40 52">
+      <line x1="20" y1="4" x2="20" y2="13" stroke="#3a6e1a" stroke-width="1.8" stroke-linecap="round"/>
+      <ellipse cx="13" cy="5" rx="6" ry="3.5" fill="#5aab28" transform="rotate(-25 13 5)"/>
+      <ellipse cx="27" cy="5" rx="6" ry="3.5" fill="#4a9520" transform="rotate(25 27 5)"/>
+      <ellipse cx="20" cy="31" rx="13" ry="14" fill="#1976d2"/>
+      <ellipse cx="20" cy="34" rx="6" ry="3" fill="#1565c0"/>
+      <ellipse cx="20" cy="30" rx="9" ry="6" fill="#42a5f5" opacity="0.4"/>
+      <circle cx="14.5" cy="25" r="3.5" fill="white"/>
+      <circle cx="25.5" cy="25" r="3.5" fill="white"/>
+      <circle cx="15.2" cy="25.6" r="1.8" fill="#222"/>
+      <circle cx="26.2" cy="25.6" r="1.8" fill="#222"/>
+      <circle cx="14.6" cy="24.8" r="0.9" fill="white"/>
+      <circle cx="25.6" cy="24.8" r="0.9" fill="white"/>
+      <ellipse cx="13" cy="46" rx="5" ry="3.5" fill="#1565c0"/>
+      <ellipse cx="27" cy="46" rx="5" ry="3.5" fill="#1565c0"/>
+    </symbol>
+  </defs>
+</svg>
 
 <!-- Top App Bar -->
 <header class="sticky top-0 z-50
                bg-[#faf9f6]/85 backdrop-blur-md
                shadow-[0_4px_24px_rgba(48,51,48,0.07)]
-               flex items-center justify-between px-6 py-4">
+               flex items-center justify-between px-6 py-3">
   <div class="flex items-center gap-3">
-    <span class="material-symbols-outlined text-xl" style="color:#386b02">potted_plant</span>
-    <h1 class="text-xl font-headline font-bold" style="color:#386b02">Botanical Archivist</h1>
+    <!-- Small Red Pikmin in header -->
+    <svg width="22" height="28" aria-hidden="true"><use href="#pikmin-red"/></svg>
+    <h1 class="text-lg font-headline font-bold" style="color:#386b02">皮克敏座標擷取器</h1>
   </div>
 </header>
 
 <main class="px-5 pt-8 max-w-2xl mx-auto space-y-8">
 
   <!-- Hero -->
-  <section class="space-y-1">
-    <h2 class="text-4xl font-headline font-extrabold tracking-tight text-on-background leading-tight">
-      皮克敏 <span class="text-primary">座標擷取器</span>
-    </h2>
-    <p class="text-sm font-body text-on-surface-variant">整理繁雜的訊息，一鍵擷取座標存檔。</p>
+  <section class="flex items-end justify-between gap-4">
+    <div class="space-y-1 flex-1">
+      <h2 class="text-4xl font-headline font-extrabold tracking-tight text-on-background leading-tight">
+        皮克敏<br><span class="text-primary">座標擷取器</span>
+      </h2>
+      <p class="text-sm font-body text-on-surface-variant mt-2">
+        整理繁雜的訊息，一鍵擷取座標存檔。
+      </p>
+    </div>
+    <!-- Pikmin trio decoration -->
+    <div class="flex items-end gap-1 flex-shrink-0 pb-1" aria-hidden="true">
+      <svg width="38" height="50" class="pikmin-bob-1 opacity-90"><use href="#pikmin-blue"/></svg>
+      <svg width="46" height="60" class="pikmin-bob-2"><use href="#pikmin-red"/></svg>
+      <svg width="36" height="48" class="pikmin-bob-3 opacity-90"><use href="#pikmin-yellow"/></svg>
+    </div>
   </section>
 
   <!-- Input Card -->
@@ -118,7 +191,7 @@
         </span>
       </div>
 
-      <!-- Primary action -->
+      <!-- Extract -->
       <div class="mt-4">
         <button onclick="extract()"
           class="w-full bg-primary text-white font-headline font-bold py-4 rounded-full
@@ -148,8 +221,6 @@
 
   <!-- Results -->
   <section id="results" class="space-y-5 hidden anim-fadeup">
-
-    <!-- Results header -->
     <div class="flex items-center justify-between">
       <h3 class="text-xl font-headline font-bold text-on-background">擷取結果</h3>
       <div class="flex items-center gap-3">
@@ -166,63 +237,39 @@
         </button>
       </div>
     </div>
-
-    <!-- Card list -->
     <div id="list" class="space-y-3"></div>
   </section>
 
-  <!-- Info card -->
+  <!-- Info card with Pikmin decoration -->
   <section class="bg-secondary-container rounded-lg p-6 relative overflow-hidden">
-    <div class="relative z-10 space-y-2">
+    <div class="relative z-10 space-y-2 pr-20">
       <h4 class="font-headline font-bold text-on-secondary-container">使用說明</h4>
       <p class="text-sm text-on-secondary-container/80 leading-relaxed font-body">
         貼入 Telegram 訊息後點擊「擷取座標」，支援負數座標與多筆輸入。
         點擊任一結果卡片可複製該筆座標。
       </p>
     </div>
-    <div class="absolute -right-6 -bottom-6 opacity-10 pointer-events-none select-none">
-      <span class="material-symbols-outlined text-[100px]">eco</span>
+    <!-- Decorative Pikmin in corner -->
+    <div class="absolute right-4 bottom-2 opacity-60 pointer-events-none select-none"
+         aria-hidden="true">
+      <svg width="60" height="78"><use href="#pikmin-yellow"/></svg>
     </div>
   </section>
 
 </main>
 
-<!-- Bottom Nav -->
-<nav class="fixed bottom-0 left-0 w-full z-50
-            flex justify-around items-center px-8 pb-6 pt-3
-            bg-[#faf9f6]/85 backdrop-blur-md
-            rounded-t-[2rem]
-            shadow-[0_-4px_24px_rgba(48,51,48,0.07)]">
-  <a href="#"
-    class="flex flex-col items-center text-white bg-primary
-           rounded-full px-5 py-2.5 shadow-md
-           active:scale-90 transition-all duration-200">
-    <span class="material-symbols-outlined text-[22px]">content_paste_search</span>
-    <span class="font-headline text-[10px] font-semibold uppercase tracking-widest mt-0.5">Extractor</span>
-  </a>
-  <a href="#"
-    class="flex flex-col items-center text-on-surface/40 py-2
-           hover:text-primary active:scale-90 transition-all duration-200">
-    <span class="material-symbols-outlined text-[22px]">history</span>
-    <span class="font-headline text-[10px] font-semibold uppercase tracking-widest mt-0.5">History</span>
-  </a>
-  <a href="#"
-    class="flex flex-col items-center text-on-surface/40 py-2
-           hover:text-primary active:scale-90 transition-all duration-200">
-    <span class="material-symbols-outlined text-[22px]">folder_zip</span>
-    <span class="font-headline text-[10px] font-semibold uppercase tracking-widest mt-0.5">Archives</span>
-  </a>
-</nav>
-
 <script>
 let coords = [];
+
+// Pikmin icon SVGs for result cards (red / yellow / blue cycle)
+const PIKMIN_ICONS = ['pikmin-red', 'pikmin-yellow', 'pikmin-blue'];
 
 function extract() {
   const text = document.getElementById('input').value.trim();
   if (!text) return;
   coords = [];
 
-  const lines  = text.split('\n');
+  const lines   = text.split('\n');
   const coordRe = /[-\d]+\.\d+\s*,\s*[-\d]+\.\d+/g;
   const locRe   = /^\d+[\.\、\)）]\s*(.+)/;
   let label = '';
@@ -271,6 +318,7 @@ function render() {
   document.getElementById('copy-all-btn').classList.remove('hidden');
 
   coords.forEach((r, i) => {
+    const pikminId = PIKMIN_ICONS[i % PIKMIN_ICONS.length];
     const card = document.createElement('div');
     card.className = [
       'anim-slidein',
@@ -284,9 +332,9 @@ function render() {
 
     card.innerHTML = `
       <div class="flex items-center gap-4">
-        <div class="w-11 h-11 rounded-full bg-[#81d4fa]/30
+        <div class="w-11 h-11 rounded-full bg-[#81d4fa]/25
                     flex items-center justify-center flex-shrink-0">
-          <span class="material-symbols-outlined text-[#006786]">location_on</span>
+          <svg width="28" height="36" aria-hidden="true"><use href="#${pikminId}"/></svg>
         </div>
         <div class="space-y-1">
           <div class="bg-[#81d4fa] text-[#00485e]
