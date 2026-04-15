@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>座標擷取器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0e10;
+    --surface: #18181b;
+    --surface2: #232329;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --accent: #4ade80;
+    --accent-dim: rgba(74,222,128,0.12);
+    --accent-dim2: rgba(74,222,128,0.22);
+    --text: #f4f4f5;
+    --text2: #a1a1aa;
+    --text3: #52525b;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Noto Sans TC', sans-serif;
+  }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 16px 80px;
+  }
+
+  /* background grid */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(74,222,128,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74,222,128,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap { position: relative; z-index: 1; width: 100%; max-width: 680px; }
+
+  header { margin-bottom: 40px; }
+  .tag {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em;
+    color: var(--accent); text-transform: uppercase;
+    border: 1px solid rgba(74,222,128,0.3);
+    display: inline-block; padding: 3px 10px; border-radius: 4px;
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-size: 32px; font-weight: 300; letter-spacing: -0.5px;
+    color: var(--text); line-height: 1.2;
+  }
+  h1 span { color: var(--accent); font-weight: 500; }
+  .sub { margin-top: 8px; font-size: 13px; color: var(--text3); font-weight: 300; }
+
+  /* Input area */
+  .input-box {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+  .input-box:focus-within { border-color: rgba(74,222,128,0.4); }
+
+  .input-label {
+    padding: 12px 16px 0;
+    font-size: 11px; letter-spacing: 0.08em;
+    font-family: var(--mono); color: var(--text3); text-transform: uppercase;
+  }
+  textarea {
+    display: block; width: 100%;
+    background: transparent; border: none; outline: none; resize: none;
+    font-family: var(--mono); font-size: 13px; color: var(--text2);
+    line-height: 1.7; padding: 10px 16px 16px;
+  }
+  textarea::placeholder { color: var(--text3); }
+
+  .input-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--text3); font-family: var(--mono);
+  }
+
+  /* Extract button */
+  .extract-btn {
+    width: 100%; padding: 14px;
+    background: var(--accent-dim);
+    border: 1px solid rgba(74,222,128,0.35);
+    border-radius: 10px;
+    font-family: var(--mono); font-size: 14px; letter-spacing: 0.06em;
+    color: var(--accent); cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    margin-bottom: 28px;
+  }
+  .extract-btn:hover { background: var(--accent-dim2); }
+  .extract-btn:active { transform: scale(0.99); }
+
+  /* Results */
+  #results { display: none; }
+  .results-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .results-count {
+    font-family: var(--mono); font-size: 12px; color: var(--text3);
+  }
+  .results-count strong { color: var(--accent); font-weight: 600; }
+
+  .copy-all-btn {
+    padding: 6px 16px;
+    background: transparent;
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    font-family: var(--mono); font-size: 12px;
+    color: var(--text2); cursor: pointer;
+    transition: all 0.15s;
+  }
+  .copy-all-btn:hover { border-color: rgba(74,222,128,0.4); color: var(--accent); }
+  .copy-all-btn.ok { border-color: rgba(74,222,128,0.5); color: var(--accent); background: var(--accent-dim); }
+
+  /* Coord cards */
+  .coord-card {
+    display: flex; align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: background 0.1s, border-color 0.15s;
+    gap: 12px;
+  }
+  .coord-card:hover { background: var(--surface2); border-color: var(--border2); }
+  .coord-card.flash {
+    background: rgba(74,222,128,0.08);
+    border-color: rgba(74,222,128,0.3);
+  }
+
+  .card-num {
+    font-family: var(--mono); font-size: 11px; color: var(--text3);
+    min-width: 22px; text-align: right; flex-shrink: 0;
+  }
+  .card-body { flex: 1; min-width: 0; }
+  .card-label {
+    font-size: 11px; color: var(--text3);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-bottom: 3px;
+  }
+  .card-coord {
+    font-family: var(--mono); font-size: 15px; font-weight: 600;
+    color: var(--text); letter-spacing: 0.02em;
+  }
+  .card-action {
+    font-family: var(--mono); font-size: 11px;
+    padding: 4px 12px; border-radius: 5px;
+    border: 1px solid var(--border2);
+    color: var(--text3); flex-shrink: 0;
+    transition: all 0.15s;
+    min-width: 52px; text-align: center;
+  }
+  .coord-card:hover .card-action { border-color: rgba(74,222,128,0.3); color: var(--accent); }
+  .card-action.ok { border-color: rgba(74,222,128,0.5); color: var(--accent); background: var(--accent-dim); }
+
+  .empty-msg {
+    font-family: var(--mono); font-size: 13px; color: var(--text3);
+    padding: 20px 0; text-align: center;
+  }
+
+  /* keyboard hint */
+  kbd {
+    font-family: var(--mono); font-size: 11px;
+    border: 1px solid var(--border2); border-radius: 4px;
+    padding: 1px 5px; color: var(--text3);
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="tag">Coordinate Extractor</div>
+    <h1>皮克敏<span>座標擷取器</span></h1>
+    <p class="sub">貼上 Telegram 訊息 → 一鍵複製座標</p>
+  </header>
+
+  <div class="input-box">
+    <div class="input-label">訊息內容</div>
+    <textarea id="input" rows="10" placeholder="1. (紐西蘭) Albert-EdenGreenlane
+• 座標：-36.891357,174.795049
+• 建議：中高優先
+
+2. (美国) Rochester
+• 座標：44.021698,-92.460725
+• 建議：高優先
+
+...（支援一次貼多筆）"></textarea>
+    <div class="input-footer">
+      <span>支援負數座標、多筆訊息</span>
+      <span><kbd>Ctrl</kbd> + <kbd>Enter</kbd> 快速擷取</span>
+    </div>
+  </div>
+
+  <button class="extract-btn" onclick="extract()">▶ 擷取座標</button>
+
+  <div id="results">
+    <div class="results-header">
+      <div class="results-count" id="count"></div>
+      <button class="copy-all-btn" id="copy-all-btn" onclick="copyAll()">複製全部</button>
+    </div>
+    <div id="list"></div>
+  </div>
+</div>
+
+<script>
+let coords = [];
+
+function extract() {
+  const text = document.getElementById('input').value.trim();
+  if (!text) return;
+  coords = [];
+
+  const lines = text.split('\n');
+  const coordRe = /[-\d]+\.\d+\s*,\s*[-\d]+\.\d+/g;
+  const locRe = /^\d+[\.\、\)）]\s*(.+)/;
+  let label = '';
+
+  for (const line of lines) {
+    const l = line.trim();
+    const lm = l.match(locRe);
+    if (lm) label = lm[1].replace(/[()（）【】]/g, '').trim();
+    const ms = l.match(coordRe);
+    if (ms) ms.forEach(c => coords.push({ coord: c.replace(/\s/g, ''), label }));
+  }
+
+  render();
+}
+
+function render() {
+  const listEl = document.getElementById('list');
+  const resEl = document.getElementById('results');
+  listEl.innerHTML = '';
+  resEl.style.display = 'block';
+
+  if (coords.length === 0) {
+    listEl.innerHTML = '<div class="empty-msg">未找到座標，請確認格式含「數字,數字」</div>';
+    document.getElementById('count').innerHTML = '';
+    document.getElementById('copy-all-btn').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('count').innerHTML = `找到 <strong>${coords.length}</strong> 筆座標`;
+  document.getElementById('copy-all-btn').style.display = '';
+
+  coords.forEach((r, i) => {
+    const card = document.createElement('div');
+    card.className = 'coord-card';
+    card.innerHTML = `
+      <span class="card-num">${i + 1}</span>
+      <div class="card-body">
+        ${r.label ? `<div class="card-label">${r.label}</div>` : ''}
+        <div class="card-coord">${r.coord}</div>
+      </div>
+      <span class="card-action" id="act${i}">複製</span>
+    `;
+    card.addEventListener('click', () => copyOne(r.coord, i, card));
+    listEl.appendChild(card);
+  });
+}
+
+function copyOne(coord, idx, card) {
+  navigator.clipboard.writeText(coord).then(() => {
+    const act = document.getElementById('act' + idx);
+    act.textContent = '已複製';
+    act.classList.add('ok');
+    card.classList.add('flash');
+    setTimeout(() => {
+      act.textContent = '複製';
+      act.classList.remove('ok');
+      card.classList.remove('flash');
+    }, 1200);
+  });
+}
+
+function copyAll() {
+  if (!coords.length) return;
+  navigator.clipboard.writeText(coords.map(r => r.coord).join('\n')).then(() => {
+    const btn = document.getElementById('copy-all-btn');
+    btn.textContent = '✓ 已複製全部';
+    btn.classList.add('ok');
+    setTimeout(() => {
+      btn.textContent = '複製全部';
+      btn.classList.remove('ok');
+    }, 1500);
+  });
+}
+
+document.getElementById('input').addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') extract();
+});
+</script>
+</body>
+</html>
