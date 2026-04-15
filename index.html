@@ -119,24 +119,14 @@
       </div>
 
       <!-- Primary action -->
-      <div class="flex gap-3 mt-4">
+      <div class="mt-4">
         <button onclick="extract()"
-          class="flex-1 bg-primary text-white font-headline font-bold py-4 rounded-full
+          class="w-full bg-primary text-white font-headline font-bold py-4 rounded-full
                  shadow-[0_4px_16px_rgba(56,107,2,0.30)]
                  hover:bg-[#2e7a51] active:scale-95 transition-all duration-200
                  flex items-center justify-center gap-2">
           <span class="material-symbols-outlined text-[20px]">search</span>
           擷取座標
-        </button>
-        <button onclick="pasteClipboard()"
-          class="bg-surface-container-lowest border border-outline-variant/50
-                 text-on-surface-variant font-headline font-semibold
-                 px-5 rounded-full
-                 hover:bg-surface-container hover:border-primary/30
-                 active:scale-95 transition-all duration-200
-                 flex items-center justify-center gap-1.5">
-          <span class="material-symbols-outlined text-[18px]">content_paste</span>
-          貼上
         </button>
       </div>
 
@@ -368,19 +358,6 @@ function clearInput() {
   el.focus();
   coords = [];
   document.getElementById('results').classList.add('hidden');
-}
-
-async function pasteClipboard() {
-  try {
-    const text = await navigator.clipboard.readText();
-    const el = document.getElementById('input');
-    el.value = text;
-    onInput(el);
-    el.focus();
-  } catch {
-    // Permission denied or API unavailable — focus for manual paste
-    document.getElementById('input').focus();
-  }
 }
 
 function onInput(el) {
